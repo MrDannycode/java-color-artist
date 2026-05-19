@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane id="gameRoot"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.colorartist.GameController">
+
+    <!-- Top Bar -->
+    <top>
+        <HBox id="topBar" alignment="CENTER_LEFT" spacing="16">
+            <Button fx:id="backBtn" text="← Back" styleClass="btn-back" onAction="#onBackClick"/>
+            <Label fx:id="levelTitleLabel" id="levelTitleLabel" text="Level"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <VBox alignment="CENTER_RIGHT" spacing="4">
+                <Label fx:id="progressLabel" id="progressLabel" text="0 / 0"/>
+                <ProgressBar fx:id="progressBar" prefWidth="180" progress="0"/>
+            </VBox>
+            <Button fx:id="resetBtn" text="↻ Reset" styleClass="btn-action" onAction="#onResetClick"/>
+        </HBox>
+    </top>
+
+    <!-- Center: Canvas Area -->
+    <center>
+        <StackPane fx:id="canvasContainer" id="canvasContainer"/>
+    </center>
+
+    <!-- Bottom: Color Palette -->
+    <bottom>
+        <HBox fx:id="paletteBar" id="paletteBar" alignment="CENTER" spacing="12"/>
+    </bottom>
+</BorderPane>
