@@ -2,6 +2,7 @@ package com.example.colorartist;
 
 import com.example.colorartist.levels.LevelGenerator;
 import com.example.colorartist.model.LevelData;
+import com.example.colorartist.patterns.singleton.GameManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -92,11 +93,7 @@ public class MenuController implements Initializable {
 
         // Click handler
         card.setOnMouseClicked(e -> {
-            try {
-                ColorArtistApp.showGame(index);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+            GameManager.getInstance().navigateToGame(index);
         });
 
         return card;

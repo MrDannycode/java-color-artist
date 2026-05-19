@@ -26,6 +26,7 @@
                 <Label fx:id="progressLabel" id="progressLabel" text="0 / 0"/>
                 <ProgressBar fx:id="progressBar" prefWidth="180" progress="0"/>
             </VBox>
+            <Button fx:id="undoBtn" text="↶ Undo" styleClass="btn-action" onAction="#onUndoClick" disable="true"/>
             <Button fx:id="resetBtn" text="↻ Reset" styleClass="btn-action" onAction="#onResetClick"/>
         </HBox>
     </top>

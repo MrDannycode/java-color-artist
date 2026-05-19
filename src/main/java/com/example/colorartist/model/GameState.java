@@ -1,11 +1,18 @@
 package com.example.colorartist.model;
 
 import javafx.scene.paint.Color;
+import com.example.colorartist.patterns.observer.GameSubject;
+import com.example.colorartist.patterns.observer.GameObserver;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Tracks the current game state during gameplay.
  */
-public class GameState {
+public class GameState implements GameSubject {
+
+    private final List<GameObserver> observers = new ArrayList<>();
 
     private LevelData currentLevel;
     private int selectedColorNumber = -1;
@@ -55,5 +62,30 @@ public class GameState {
         currentLevel.resetAll();
         selectedColor = null;
         selectedColorNumber = -1;
+        notifyObservers();
+    }
+
+    // --- Observer Implementation ---
+    @Override
+    public void attach(GameObserver observer) {
+        if (!observers.contains(observer)) {
+            observers.add(observer);
+        }
+    }
+
+    @Override
+    public void detach(GameObserver observer) {
+        observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers() {
+        boolean isComplete = isComplete();
+        int colored = (int) currentLevel.getColoredCount();
+        int total = currentLevel.getTotalRegions();
+        
+        for (GameObserver observer : observers) {
+            observer.onGameStateChanged(colored, total, isComplete);
+        }
     }
 }

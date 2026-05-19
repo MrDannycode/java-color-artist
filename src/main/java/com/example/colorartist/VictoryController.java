@@ -1,6 +1,7 @@
 package com.example.colorartist;
 
 import com.example.colorartist.levels.LevelGenerator;
+import com.example.colorartist.patterns.singleton.GameManager;
 import javafx.animation.ScaleTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -44,19 +45,11 @@ public class VictoryController {
 
     @FXML
     protected void onMenuClick() {
-        try {
-            ColorArtistApp.showMenu();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        GameManager.getInstance().navigateToMenu();
     }
 
     @FXML
     protected void onNextLevelClick() {
-        try {
-            ColorArtistApp.showGame(currentLevelIndex + 1);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        GameManager.getInstance().navigateToGame(currentLevelIndex + 1);
     }
 }

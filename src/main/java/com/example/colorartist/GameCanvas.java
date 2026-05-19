@@ -2,6 +2,8 @@ package com.example.colorartist;
 
 import com.example.colorartist.model.ColorRegion;
 import com.example.colorartist.model.LevelData;
+import com.example.colorartist.patterns.decorator.DrawableRegion;
+import com.example.colorartist.patterns.decorator.HoverRegionDecorator;
 import javafx.animation.FadeTransition;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -12,6 +14,10 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
+
+import java.util.function.Consumer;
+import com.example.colorartist.patterns.command.Command;
+import com.example.colorartist.patterns.command.ColorCommand;
 
 /**
  * Custom canvas component for rendering and interacting with the coloring game.
@@ -31,8 +37,8 @@ public class GameCanvas extends Pane {
     private double lastMouseX, lastMouseY;
     private boolean isPanning = false;
 
-    // Callback
-    private Runnable onRegionColored;
+    // Callback pentru sablonul Command
+    private Consumer<Command> onCommandExecuted;
 
     public GameCanvas() {
         canvas = new Canvas();
@@ -61,8 +67,8 @@ public class GameCanvas extends Pane {
         draw();
     }
 
-    public void setOnRegionColored(Runnable callback) {
-        this.onRegionColored = callback;
+    public void setOnCommandExecuted(Consumer<Command> callback) {
+        this.onCommandExecuted = callback;
     }
 
     private void autoFitZoom() {
@@ -104,10 +110,14 @@ public class GameCanvas extends Pane {
                         .filter(r -> r.getId() == regionId)
                         .findFirst().orElse(null);
                 if (region != null && region.getColorNumber() == selectedColorNumber && !region.isColored()) {
-                    region.setColor(selectedColor);
+                    
+                    // Sablon COMMAND: Cream comanda, o executam si notificam controller-ul
+                    ColorCommand command = new ColorCommand(region, selectedColor);
+                    command.execute();
                     draw();
-                    if (onRegionColored != null) {
-                        onRegionColored.run();
+                    
+                    if (onCommandExecuted != null) {
+                        onCommandExecuted.accept(command);
                     }
                 }
             }
@@ -197,65 +207,19 @@ public class GameCanvas extends Pane {
         gc.setFill(Color.web("#fafafa"));
         gc.fillRect(-2, -2, levelData.getCanvasWidth() + 4, levelData.getCanvasHeight() + 4);
 
-        // Draw regions
+        // Draw regions using Decorator pattern
         for (ColorRegion region : levelData.getRegions()) {
-            drawRegion(gc, region);
+            DrawableRegion drawable = region;
+            
+            // Daca e regiunea cu hover, o invelim in decorator
+            if (region.getId() == hoveredRegionId) {
+                drawable = new HoverRegionDecorator(region);
+            }
+            
+            drawable.draw(gc, panX, panY, zoom, selectedColorNumber, selectedColor);
         }
 
         gc.restore();
-    }
-
-    private void drawRegion(GraphicsContext gc, ColorRegion region) {
-        double[] xPts = region.getXPoints();
-        double[] yPts = region.getYPoints();
-
-        // Fill
-        if (region.isColored()) {
-            gc.setFill(region.getCurrentColor());
-        } else if (selectedColorNumber >= 0 && region.getColorNumber() == selectedColorNumber) {
-            // Highlight matching regions with a subtle tint
-            gc.setFill(Color.web("#e8e8f0"));
-        } else {
-            gc.setFill(Color.WHITE);
-        }
-        gc.fillPolygon(xPts, yPts, xPts.length);
-
-        // Hover highlight
-        if (region.getId() == hoveredRegionId && !region.isColored()) {
-            if (selectedColor != null && region.getColorNumber() == selectedColorNumber) {
-                gc.setFill(selectedColor.deriveColor(0, 0.3, 1.3, 0.5));
-            } else {
-                gc.setFill(Color.rgb(200, 200, 255, 0.3));
-            }
-            gc.fillPolygon(xPts, yPts, xPts.length);
-        }
-
-        // Border
-        gc.setStroke(Color.web("#333333", 0.6));
-        gc.setLineWidth(1.2 / zoom);
-        gc.strokePolygon(xPts, yPts, xPts.length);
-
-        // Number label (only if not colored)
-        if (!region.isColored()) {
-            double cx = region.getCenterX();
-            double cy = region.getCenterY();
-
-            double fontSize = Math.max(10, 14 / Math.sqrt(zoom > 0.5 ? 1 : zoom));
-            gc.setFont(Font.font("Arial", FontWeight.BOLD, fontSize));
-            gc.setTextAlign(TextAlignment.CENTER);
-
-            // Background circle for number
-            double circleR = fontSize * 0.7;
-            gc.setFill(Color.rgb(255, 255, 255, 0.85));
-            gc.fillOval(cx - circleR, cy - circleR, circleR * 2, circleR * 2);
-
-            gc.setStroke(Color.web("#999999"));
-            gc.setLineWidth(0.5);
-            gc.strokeOval(cx - circleR, cy - circleR, circleR * 2, circleR * 2);
-
-            gc.setFill(Color.web("#333333"));
-            gc.fillText(String.valueOf(region.getColorNumber()), cx, cy + fontSize * 0.35);
-        }
     }
 
     public void resetView() {

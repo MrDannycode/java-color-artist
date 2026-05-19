@@ -8,31 +8,38 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class ColorArtistApp extends Application {
+import com.example.colorartist.patterns.singleton.GameManager;
 
-    private static Stage primaryStage;
+public class ColorArtistApp extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        primaryStage = stage;
-
         // Load custom fonts
         Font.loadFont(getClass().getResourceAsStream("fonts/Poppins-Bold.ttf"), 14);
         Font.loadFont(getClass().getResourceAsStream("fonts/Poppins-Regular.ttf"), 14);
         Font.loadFont(getClass().getResourceAsStream("fonts/Poppins-SemiBold.ttf"), 14);
 
-        showMenu();
+        // Initializare Singleton pentru managerul de joc
+        GameManager.getInstance().init(stage);
+        
+        // Pornire joc la ecranul de meniu
+        GameManager.getInstance().navigateToMenu();
     }
 
+    // Aceste metode raman aici temporar ca utility pentru GameManager
     public static void showMenu() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(ColorArtistApp.class.getResource("menu-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1024, 768);
         scene.getStylesheets().add(ColorArtistApp.class.getResource("styles.css").toExternalForm());
-        primaryStage.setTitle("Color Artist");
-        primaryStage.setScene(scene);
-        primaryStage.setMinWidth(800);
-        primaryStage.setMinHeight(600);
-        primaryStage.show();
+        
+        Stage stage = GameManager.getInstance().getPrimaryStage();
+        if (stage != null) {
+            stage.setTitle("Color Artist");
+            stage.setScene(scene);
+            stage.setMinWidth(800);
+            stage.setMinHeight(600);
+            stage.show();
+        }
     }
 
     public static void showGame(int levelIndex) throws IOException {
@@ -43,7 +50,8 @@ public class ColorArtistApp extends Application {
         GameController controller = fxmlLoader.getController();
         controller.loadLevel(levelIndex);
 
-        primaryStage.setScene(scene);
+        Stage stage = GameManager.getInstance().getPrimaryStage();
+        if (stage != null) stage.setScene(scene);
     }
 
     public static void showVictory(int levelIndex, int totalRegions) throws IOException {
@@ -54,11 +62,8 @@ public class ColorArtistApp extends Application {
         VictoryController controller = fxmlLoader.getController();
         controller.setup(levelIndex, totalRegions);
 
-        primaryStage.setScene(scene);
-    }
-
-    public static Stage getPrimaryStage() {
-        return primaryStage;
+        Stage stage = GameManager.getInstance().getPrimaryStage();
+        if (stage != null) stage.setScene(scene);
     }
 
     public static void main(String[] args) {
