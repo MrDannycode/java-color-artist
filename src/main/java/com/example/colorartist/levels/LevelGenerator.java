@@ -48,6 +48,24 @@ public class LevelGenerator {
         List<ColorRegion> regions = new ArrayList<>();
         int id = 0;
 
+        // Background quadrants (4 pieces)
+        regions.add(new ColorRegion(id++, 4,
+                new double[]{0, 250, 250, 0},
+                new double[]{0, 0, 250, 250},
+                palette.get(4)));
+        regions.add(new ColorRegion(id++, 4,
+                new double[]{250, 500, 500, 250},
+                new double[]{0, 0, 250, 250},
+                palette.get(4)));
+        regions.add(new ColorRegion(id++, 4,
+                new double[]{0, 250, 250, 0},
+                new double[]{250, 250, 500, 500},
+                palette.get(4)));
+        regions.add(new ColorRegion(id++, 4,
+                new double[]{250, 500, 500, 250},
+                new double[]{250, 250, 500, 500},
+                palette.get(4)));
+
         double cx = 250, cy = 200, petalR = 80, centerR = 35;
 
         // 5 petals (pentagons approximating ellipses)
@@ -100,24 +118,6 @@ public class LevelGenerator {
                 new double[]{250, 300, 320, 300, 258},
                 new double[]{350, 370, 340, 310, 330},
                 palette.get(3)));
-
-        // Background quadrants (4 pieces)
-        regions.add(new ColorRegion(id++, 4,
-                new double[]{0, 250, 250, 0},
-                new double[]{0, 0, 250, 250},
-                palette.get(4)));
-        regions.add(new ColorRegion(id++, 4,
-                new double[]{250, 500, 500, 250},
-                new double[]{0, 0, 250, 250},
-                palette.get(4)));
-        regions.add(new ColorRegion(id++, 4,
-                new double[]{0, 250, 250, 0},
-                new double[]{250, 250, 500, 500},
-                palette.get(4)));
-        regions.add(new ColorRegion(id++, 4,
-                new double[]{250, 500, 500, 250},
-                new double[]{250, 250, 500, 500},
-                palette.get(4)));
 
         return new LevelData("Flower", "Easy", regions, palette, W, H);
     }
